@@ -691,6 +691,7 @@ defmodule RethinkDB.Query do
 
   """
   @spec add([Q.reql_number() | Q.reql_string() | Q.reql_array()] | Q.t()) :: Q.t()
+  operate_on_list(:add, 24)
   operate_on_single_arg(:add, 24)
 
   @doc """
