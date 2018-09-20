@@ -675,17 +675,24 @@ defmodule RethinkDB.Query do
   operate_on_two_args(:add, 24)
 
   @doc """
-  Add multiple values.
+  Add multiple values or concatenate multiple strings or arrays.
 
       iex> add([1, 2]) |> run conn
       %RethinkDB.Record{data: 3}
 
       iex> add(["hello", " world"]) |> run
       %RethinkDB.Record{data: "hello world"}
+      
+      iex> add(args([10,20,30])) |> run conn
+      %RethinkDB.Record{data: 60}
+      
+      iex> add(args([[1, 2], [3, 4]])) |> run conn
+      %RethinkDB.Record{data: [1, 2, 3, 4]}
 
   """
-  @spec add([Q.reql_number() | Q.reql_string() | Q.reql_array()]) :: Q.t()
+  @spec add([Q.reql_number() | Q.reql_string() | Q.reql_array()] | Q.t()) :: Q.t()
   operate_on_list(:add, 24)
+  operate_on_single_arg(:add, 24)
 
   @doc """
   Subtract two numbers.
