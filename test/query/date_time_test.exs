@@ -23,9 +23,9 @@ defmodule DateTimeTest do
 
   test "time native" do
     {:ok, %Record{data: data}} = time(1970, 1, 1, "Z") |> run
-    assert data == DateTime.from_unix!(0, :milliseconds)
+    assert data == DateTime.from_unix!(0, :millisecond)
     {:ok, %Record{data: data}} = time(1970, 1, 1, 0, 0, 1, "Z") |> run(binary_format: :native)
-    assert data == DateTime.from_unix!(1000, :milliseconds)
+    assert data == DateTime.from_unix!(1000, :millisecond)
   end
 
   test "time raw" do
@@ -37,7 +37,7 @@ defmodule DateTimeTest do
 
   test "epoch_time native" do
     {:ok, %Record{data: data}} = epoch_time(1) |> run
-    assert data == DateTime.from_unix!(1000, :milliseconds)
+    assert data == DateTime.from_unix!(1000, :millisecond)
   end
 
   test "epoch_time raw" do
@@ -48,12 +48,12 @@ defmodule DateTimeTest do
 
   test "iso8601 native" do
     {:ok, %Record{data: data}} = iso8601("1970-01-01T00:00:00+00:00") |> run
-    assert data == DateTime.from_unix!(0, :milliseconds)
+    assert data == DateTime.from_unix!(0, :millisecond)
     {:ok, %Record{data: data}} = iso8601("1970-01-01T00:00:00", default_timezone: "+01:00") |> run
 
     assert data ==
-             DateTime.from_unix!(-3_600_000, :milliseconds)
-             |> struct(utc_offset: 3600, time_zone: "Etc/GMT-1", zone_abbr: "+01:00")
+             DateTime.from_unix!(-3_600_000, :millisecond)
+             |> struct(utc_offset: 3600, time_zone: "Etc/GMT-1", zone_abbr: "+01")
   end
 
   test "iso8601 raw" do
@@ -72,8 +72,8 @@ defmodule DateTimeTest do
     {:ok, %Record{data: data}} = epoch_time(0) |> in_timezone("+01:00") |> run
 
     assert data ==
-             DateTime.from_unix!(0, :milliseconds)
-             |> struct(utc_offset: 3600, time_zone: "Etc/GMT-1", zone_abbr: "+01:00")
+             DateTime.from_unix!(0, :millisecond)
+             |> struct(utc_offset: 3600, time_zone: "Etc/GMT-1", zone_abbr: "+01")
   end
 
   test "in_timezone raw" do
@@ -99,7 +99,7 @@ defmodule DateTimeTest do
 
   test "date native" do
     {:ok, %Record{data: data}} = epoch_time(5) |> date |> run
-    assert data == DateTime.from_unix!(0, :milliseconds)
+    assert data == DateTime.from_unix!(0, :millisecond)
   end
 
   test "date raw" do

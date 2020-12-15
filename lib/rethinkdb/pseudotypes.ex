@@ -51,55 +51,43 @@ defmodule RethinkDB.Pseudotypes do
 
     def parse(
           %{"$reql_type$" => "TIME", "epoch_time" => epoch_time, "timezone" => timezone},
-          opts
-        ) do
+      opts
+    ) do
       case Keyword.get(opts, :time_format) do
         :raw ->
           %__MODULE__{epoch_time: epoch_time, timezone: timezone}
 
         _ ->
-          {seconds, ""} = Calendar.ISO.parse_offset(timezone)
 
-          zone_abbr =
-            case seconds do
-              0 -> "UTC"
-              _ -> timezone
+          time = (epoch_time * 1000)
+                 |> trunc()
+                 |> Timex.from_unix(:millisecond)
+
+
+            zone = if is_offset?(timezone) do
+              Timex.Timezone.name_of(timezone)
+              |> Timex.timezone(time)
+            else
+              Timex.timezone(timezone, time)
             end
 
-          negative = seconds < 0
-          seconds = abs(seconds)
-
-          time_zone =
-            case {div(seconds, 3600), rem(seconds, 3600)} do
-              {0, 0} ->
-                "Etc/UTC"
-
-              {hours, 0} ->
-                "Etc/GMT" <>
-                  if negative do
-                    "+"
-                  else
-                    "-"
-                  end <> Integer.to_string(hours)
-
-              {hours, seconds} ->
-                "Etc/GMT" <>
-                  if negative do
-                    "+"
-                  else
-                    "-"
-                  end <>
-                  Integer.to_string(hours) <>
-                  ":" <> String.pad_leading(Integer.to_string(seconds), 2, "0")
-            end
-
-          (epoch_time * 1000)
-          |> trunc()
-          |> DateTime.from_unix!(:milliseconds)
-          |> struct(utc_offset: seconds, zone_abbr: zone_abbr, time_zone: time_zone)
+            time |> struct(utc_offset: Map.get(zone, :offset_utc), time_zone: Map.get(zone, :full_name), zone_abbr: Map.get(zone, :abbreviation))
       end
     end
-  end
+
+    defp is_offset?("+" <> <<_::bytes-size(2)>> <> ":" <> <<_::bytes-size(2)>>) do
+      true
+    end
+
+    defp is_offset?("-" <> <<_::bytes-size(2)>> <> ":" <> <<_::bytes-size(2)>>) do
+      true
+    end
+
+    defp is_offset?(_string) do
+      false
+    end
+end
+
 
   def convert_reql_pseudotypes(nil, _opts), do: nil
 

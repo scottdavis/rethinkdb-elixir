@@ -31,7 +31,7 @@ defmodule RethinkDB.Mixfile do
         _ -> []
       end
 
-    [applications: [:logger, :poison, :connection | env_apps]]
+    [applications: [:logger, :poison, :connection, :ssl, :timex | env_apps]]
   end
 
   # Dependencies can be Hex packages:
@@ -50,6 +50,8 @@ defmodule RethinkDB.Mixfile do
       {:flaky_connection, github: "norpan/flaky_connection", only: :test},
       {:connection, "~> 1.0"},
       {:excoveralls, "~> 0.8", only: :test},
+      {:tzdata, "~> 1.0"},
+      {:timex, "~> 3.0"},
       {:dialyxir, "~> 0.5", only: :dev}
     ]
   end
